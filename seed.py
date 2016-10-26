@@ -2,8 +2,8 @@
 
 from sqlalchemy import func
 from model import User
-from model import Rating
 from model import Movie
+from model import Rating
 
 from datetime import datetime
 
@@ -77,25 +77,34 @@ def load_ratings():
     # Delete all rows in table, so if we need to run this a second time,
     # we won't be trying to add duplicate users
     Rating.query.delete()
-
+    counter = 0
     # Read u.user file and insert data
     for row in open("seed_data/u.data"):
         row = row.rstrip()
-        print row
+        
         #split on whitespace
-        rating_id, movie_id, user_id, score = row.split()
+        user_id, movie_id, score, timestamp = row.split()
 
+        user_id = int(user_id)
+        movie_id = int(movie_id)
+        score = int(score)
 
-        rating = Rating(rating_id=rating_id,
-                         movie_id=movie_id,
+        rating = Rating(movie_id=movie_id,
                          user_id=user_id,
                          score=score)
 
         # We need to add to the session or it won't ever be stored
         db.session.add(rating)
-
+        counter = counter + 1
+        if counter % 100 == 0:
+            print counter
+        # if counter == 100000:
+        #     break
     # Once we're done, we should commit our work
+    print "outside of for loop"
     db.session.commit()
+    print "committed yo"
+
 
 def set_val_user_id():
     """Set value for the next user_id after seeding database"""
