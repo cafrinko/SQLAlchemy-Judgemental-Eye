@@ -77,6 +77,24 @@ def login_process():
 
     return redirect('/')
 
+@app.route('/logout', methods=["GET"])
+def logout_form():
+    """Displays logout button"""
+
+    return render_template('logout_form.html')
+
+@app.route('/logout', methods=["POST"])
+def logout_process():
+    """Logs user out"""
+    
+    logout = request.form.get('logout')
+    session.clear()
+    flash('You are now logged out')
+
+    return redirect('/')
+
+
+
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
