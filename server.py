@@ -40,19 +40,42 @@ def register_form():
 def register_process():
     """Submits form and reroutes to homepage."""
 
-    email = request.args.get('useremail')
-    password = request.args.get('userpassword')
+    email = request.form.get('useremail')
+    password = request.form.get('userpassword')
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        user = User(email=email, password=password)
-        db.session.add(user)
+        new_user = User(email=email, password=password)
+        db.session.add(new_user)
         db.session.commit()
         flash("You've been added")
     else:
         flash("You already have an account. Try logging in with your email.")
 
     return redirect("/")
+
+@app.route('/login', methods=["GET"])
+def login_form():
+    """Display form."""
+
+    return render_template("login_form.html")
+
+@app.route('/login', methods=["POST"])
+def login_process():
+    """Logs in existing user."""
+
+    email = request.form.get('useremail')
+    password = request.form.get('userpassword')
+
+    user = User.query.filter_by(email=email, password=password).first()
+
+    if user:
+        session[email] = password
+        flash("You are now logged in.")
+    else:
+        flash("Your username does not match your password. Please try again with a different username password combination.")
+
+    return redirect('/')
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
