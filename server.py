@@ -24,12 +24,35 @@ def index():
     return render_template("homepage.html")
 
 @app.route('/users')
-def user_list()
+def user_list():
     """Show list of users."""
 
     users = User.query.all()
-    return render_template("user._list.html", users=users)
+    return render_template("user_list.html", users=users)
 
+@app.route('/register', methods=["GET"])
+def register_form():
+    """Display form."""
+
+    return render_template("register_form.html")
+
+@app.route('/register', methods=["POST"])
+def register_process():
+    """Submits form and reroutes to homepage."""
+
+    email = request.args.get('useremail')
+    password = request.args.get('userpassword')
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(email=email, password=password)
+        db.session.add(user)
+        db.session.commit()
+        flash("You've been added")
+    else:
+        flash("You already have an account. Try logging in with your email.")
+
+    return redirect("/")
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
@@ -38,9 +61,9 @@ if __name__ == "__main__":
 
     connect_to_db(app)
 
-    # Use the DebugToolbar
+        # Use the DebugToolbar
     DebugToolbarExtension(app)
 
 
-    
+        
     app.run()
